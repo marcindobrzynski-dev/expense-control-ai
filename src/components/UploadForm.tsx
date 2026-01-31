@@ -11,7 +11,7 @@ export default function UploadForm() {
     } else {
       setFile(null);
     }
-  }
+  };
 
   const handleUpload = () => {
     if (!file) {

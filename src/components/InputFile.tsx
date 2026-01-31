@@ -1,5 +1,5 @@
-import { Field, FieldDescription, FieldLabel } from "@/components/ui/field"
-import { Input } from "@/components/ui/input"
+import { Field, FieldDescription } from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
 
 interface InputFileProps {
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
