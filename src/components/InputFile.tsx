@@ -9,7 +9,7 @@ export default function InputFile({ onChange }: InputFileProps) {
   return (
     <Field>
       <Input type="file" accept="image/*" onChange={onChange} />
-      <FieldDescription className="text-sm mb-5">Paste your purchase receipt in photo format.</FieldDescription>
+      <FieldDescription className="text-sm mb-2">Paste your purchase receipt in photo format.</FieldDescription>
     </Field>
   );
 }

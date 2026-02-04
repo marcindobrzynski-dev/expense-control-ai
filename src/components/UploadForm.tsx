@@ -7,6 +7,7 @@ export default function UploadForm() {
   return (
     <div className="flex flex-col gap-4">
       <InputFile onChange={handleFileChange} />
+      {file && <img src={file} alt="Receipt" className="w-full h-auto rounded-md mb-2" />}
       <UploadButton onClick={handleUpload} disabled={!file} />
     </div>
   );
