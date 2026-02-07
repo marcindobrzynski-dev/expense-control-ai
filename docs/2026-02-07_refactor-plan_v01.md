@@ -10,14 +10,16 @@
 ## 1. Architecture Overview
 
 ### 1.1 Current State vs. Future State
-*   **Current:** Monolithic `UploadForm` handling state, UI, and logic. API returns raw Markdown string. No error feedback loops.
-*   **Future:** Component-driven architecture using a State Machine approach. API returns strict JSON validated by Zod. Mobile-first responsive design with shadcn/ui.
+
+- **Current:** Monolithic `UploadForm` handling state, UI, and logic. API returns raw Markdown string. No error feedback loops.
+- **Future:** Component-driven architecture using a State Machine approach. API returns strict JSON validated by Zod. Mobile-first responsive design with shadcn/ui.
 
 ### 1.2 Tech Stack Additions
-*   **Validation:** `zod` (Server-side response validation).
-*   **Icons:** `lucide-react`.
-*   **Notifications:** `sonner` (Toast notifications).
-*   **UI Components:** `shadcn/ui` (Table, ScrollArea, Dialog/Modal).
+
+- **Validation:** `zod` (Server-side response validation).
+- **Icons:** `lucide-react`.
+- **Notifications:** `sonner` (Toast notifications).
+- **UI Components:** `shadcn/ui` (Table, ScrollArea, Dialog/Modal).
 
 ---
 
@@ -50,26 +52,28 @@ export type ReceiptAnalysis = z.infer<typeof ReceiptAnalysisSchema>;
 ## 3. UI/UX Workflow (Mobile First)
 
 ### 3.1 Layout Strategy
-*   **Mobile:**
-    *   Vertical Stack.
-    *   Image Preview: `max-h-64` container with `object-contain`. Click opens Modal/Lightbox.
-    *   Results: Scrollable area.
-    *   Actions: Sticky Footer (Always visible at bottom) containing primary actions (Upload/Reset).
-*   **Desktop:**
-    *   2-Column Grid.
-    *   Left: Full-height Image Preview / Dropzone.
-    *   Right: Scrollable Results Table.
+
+- **Mobile:**
+  - Vertical Stack.
+  - Image Preview: `max-h-64` container with `object-contain`. Click opens Modal/Lightbox.
+  - Results: Scrollable area.
+  - Actions: Sticky Footer (Always visible at bottom) containing primary actions (Upload/Reset).
+- **Desktop:**
+  - 2-Column Grid.
+  - Left: Full-height Image Preview / Dropzone.
+  - Right: Scrollable Results Table.
 
 ### 3.2 State Machine
+
 The UI will react to specific states rather than checking `if (file && !summary)` everywhere.
 
-| State | UI Component Visible | Description |
-| :--- | :--- | :--- |
-| `IDLE` | `FileUploader` | Empty state, waiting for file drop. |
-| `SELECTED` | `ReceiptPreview` + `AnalyzeButton` | File selected, user verifies quality. |
-| `ANALYZING` | `ReceiptPreview` + `SkeletonUI` | Request in progress, input disabled. |
-| `SUCCESS` | `ReceiptPreview` + `AnalysisResult` | Data displayed in Table. |
-| `ERROR` | `ReceiptPreview` + `RetryButton` | Error toast displayed. |
+| State       | UI Component Visible                | Description                           |
+| :---------- | :---------------------------------- | :------------------------------------ |
+| `IDLE`      | `FileUploader`                      | Empty state, waiting for file drop.   |
+| `SELECTED`  | `ReceiptPreview` + `AnalyzeButton`  | File selected, user verifies quality. |
+| `ANALYZING` | `ReceiptPreview` + `SkeletonUI`     | Request in progress, input disabled.  |
+| `SUCCESS`   | `ReceiptPreview` + `AnalysisResult` | Data displayed in Table.              |
+| `ERROR`     | `ReceiptPreview` + `RetryButton`    | Error toast displayed.                |
 
 ---
 
@@ -78,89 +82,98 @@ The UI will react to specific states rather than checking `if (file && !summary)
 Split `UploadForm.tsx` into:
 
 ### 4.1 `FileUploader.tsx` (New)
-*   **Functionality:** Drag & drop zone.
-*   **Props:** `onFileSelect(file: File)`.
-*   **UX:**
-    *   Visual drop indicator.
-    *   `input` attribute: `capture="environment"` (opens rear camera on mobile).
-    *   Icon: `CloudUpload` from `lucide-react`.
+
+- **Functionality:** Drag & drop zone.
+- **Props:** `onFileSelect(file: File)`.
+- **UX:**
+  - Visual drop indicator.
+  - `input` attribute: `capture="environment"` (opens rear camera on mobile).
+  - Icon: `CloudUpload` from `lucide-react`.
 
 ### 4.2 `ReceiptPreview.tsx` (New)
-*   **Functionality:** Displays selected image.
-*   **Props:** `imageUrl: string`.
-*   **UX:**
-    *   Container `max-h-64`.
-    *   `onClick`: Opens full-screen Modal (`Dialog` from shadcn).
+
+- **Functionality:** Displays selected image.
+- **Props:** `imageUrl: string`.
+- **UX:**
+  - Container `max-h-64`.
+  - `onClick`: Opens full-screen Modal (`Dialog` from shadcn).
 
 ### 4.3 `AnalysisResult.tsx` (New)
-*   **Functionality:** Displays parsed JSON data.
-*   **Props:** `data: ReceiptAnalysis`.
-*   **UX:**
-    *   Header: Store Name + Date.
-    *   Body: `shadcn/ui/table` for items.
-    *   Footer: Highlighted Total Sum.
-    *   Comparison logic: Check if `sum(items) === total`. If not, show yellow warning icon.
+
+- **Functionality:** Displays parsed JSON data.
+- **Props:** `data: ReceiptAnalysis`.
+- **UX:**
+  - Header: Store Name + Date.
+  - Body: `shadcn/ui/table` for items.
+  - Footer: Highlighted Total Sum.
+  - Comparison logic: Check if `sum(items) === total`. If not, show yellow warning icon.
 
 ### 4.4 `UploadForm.tsx` (Refactor)
-*   **Role:** Smart Container (Controller).
-*   **Responsibility:**
-    *   Manages State (`useUploadForm`).
-    *   Handles layout (Desktop vs Mobile grid).
-    *   Orchestrates sub-components.
-    *   Triggers Toast notifications.
+
+- **Role:** Smart Container (Controller).
+- **Responsibility:**
+  - Manages State (`useUploadForm`).
+  - Handles layout (Desktop vs Mobile grid).
+  - Orchestrates sub-components.
+  - Triggers Toast notifications.
 
 ---
 
-## 5. Implementation Steps
+## 5. Implementation Steps & Progress
 
-### Phase 1: Foundation & Dependencies
-1.  **Install Packages:**
-    *   `npm install zod lucide-react sonner clsx tailwind-merge`
-    *   Install shadcn components: `npx shadcn@latest add table dialog scroll-area skeleton toast`
-2.  **Setup Global Toaster:**
-    *   Add `<Toaster />` to `src/layouts/Layout.astro`.
+### Phase 1: Foundation & Dependencies - DONE
 
-### Phase 2: API Refactoring (The Backend)
-3.  **Create Schema:**
-    *   Create `src/lib/schemas.ts` with Zod definitions.
-4.  **Update API Route (`src/pages/api/analyze-receipt.ts`):**
-    *   Modify LLM Prompt to request strictly structured JSON.
-    *   Implement `zod.parse()` on the LLM response.
-    *   Improve Error Handling (return standard HTTP errors with messages).
+- [x] Install `zod`, `sonner` (`lucide-react`, `clsx`, `tailwind-merge` already present)
+- [x] Install `zod-to-json-schema` (for `responseFormat` schema conversion)
+- [x] Install shadcn components: `table`, `dialog`, `scroll-area`, `skeleton`, `sonner`
+- [x] Add `<Toaster client:load />` to `src/layouts/Layout.astro`
 
-### Phase 3: Component Development (The Frontend)
-5.  **Create Dumb Components:**
-    *   Implement `FileUploader` (Dropzone + Camera).
-    *   Implement `ReceiptPreview` (Image + Modal).
-    *   Implement `AnalysisResult` (Table + Skeleton).
-6.  **Refactor Hook (`useUploadForm`):**
-    *   Update to handle JSON types.
-    *   Add loading states variables.
-    *   Add Toast triggers.
+### Phase 2: API Refactoring (The Backend) - DONE
 
-### Phase 4: Integration & Layout
-7.  **Assemble `UploadForm`:**
-    *   Implement the 2-column layout.
-    *   Implement Mobile Sticky Footer.
-8.  **Styling & Polish:**
-    *   Add Tailwind animations (`animate-in`, `fade-in`).
-    *   Ensure strict responsiveness.
+- [x] Create `src/lib/schemas.ts` with Zod definitions (`ReceiptItemSchema`, `ReceiptAnalysisSchema`)
+- [x] Export `ReceiptItem` and `ReceiptAnalysis` types
+- [x] Refactor API route (`src/pages/api/analyze-receipt.ts`):
+  - [x] Guard clause for invalid image input (400)
+  - [x] System prompt with business rules (unit price, quantity, date format)
+  - [x] `responseFormat` with `json_schema` using `zodToJsonSchema()` for strict output
+  - [x] `ReceiptAnalysisSchema.parse()` server-side validation
+  - [x] Improved error handling (`SyntaxError` distinction)
+  - [x] Response returns validated `ReceiptAnalysis` object directly (no `{ content }` wrapper)
+
+### Phase 3: Component Development (The Frontend) - TODO
+
+- [ ] Create `FileUploader.tsx` (Dropzone + Camera)
+- [ ] Create `ReceiptPreview.tsx` (Image + Modal)
+- [ ] Create `AnalysisResult.tsx` (Table + Skeleton)
+- [ ] Refactor `useUploadForm` hook:
+  - [ ] Update to handle `ReceiptAnalysis` type (replace `string` state)
+  - [ ] Add state machine states (`IDLE`, `SELECTED`, `ANALYZING`, `SUCCESS`, `ERROR`)
+  - [ ] Add Toast triggers
+- [ ] Update `openRouter.ts` to return `ReceiptAnalysis` instead of `string`
+
+### Phase 4: Integration & Layout - TODO
+
+- [ ] Assemble `UploadForm` as smart container with sub-components
+- [ ] Implement 2-column layout (desktop) / vertical stack (mobile)
+- [ ] Implement Mobile Sticky Footer
+- [ ] Add Tailwind animations (`animate-in`, `fade-in`)
+- [ ] Ensure strict responsiveness
+- [ ] Clean up unused components (`InputFile.tsx`, `UploadButton.tsx`, `ExpanseSummary.tsx`)
 
 ---
 
-## 6. Prompt Engineering (for API)
+## 6. Prompt Engineering (for API) - DONE
 
-We will use a "System Prompt" approach to ensure JSON validity.
+**Approach:** System prompt for business rules + `responseFormat` with `json_schema` for structural enforcement.
 
-**Instructions to LLM:**
-> "You are a receipt scanning machine. You only output valid JSON. Do not output Markdown formatting. Do not output text before or after the JSON."
+**System prompt** provides rules for interpreting receipt data (unit price, quantity defaults, date format, null handling).
 
-**Structure Enforcement:**
-> Provide the exact Zod schema structure in the prompt example.
+**Schema enforcement** via OpenRouter `responseFormat` using `zodToJsonSchema()` - Zod schema is the single source of truth for both LLM output constraint and server-side validation.
 
 ---
 
 ## 7. Future Considerations (Not included in this sprint)
-*   Manual editing of scanned items.
-*   User authentication / History saving.
-*   Currency conversion.
+
+- Manual editing of scanned items.
+- User authentication / History saving.
+- Currency conversion.

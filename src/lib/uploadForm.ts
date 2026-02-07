@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { getOpenRouterResult } from "./openRouter";
+import type { ReceiptAnalysis } from "./schemas";
 
 function convertToBase64(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -15,7 +16,7 @@ function convertToBase64(file: File): Promise<string> {
 export function useUploadForm() {
   const [file, setFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const [summary, setSummary] = useState<string | null>(null);
+  const [summary, setSummary] = useState<ReceiptAnalysis | null>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {

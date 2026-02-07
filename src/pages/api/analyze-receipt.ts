@@ -1,65 +1,71 @@
 import type { APIRoute } from "astro";
 import { OpenRouter } from "@openrouter/sdk";
+import { zodToJsonSchema } from "zod-to-json-schema";
+import { ReceiptAnalysisSchema } from "@/lib/schemas";
 
 export const POST: APIRoute = async ({ request }) => {
   const { imageUrl } = await request.json();
 
-  if (imageUrl && imageUrl.startsWith("data:image/")) {
-    const openRouter = new OpenRouter({
-      apiKey: import.meta.env.OPENROUTER_API_KEY,
-    });
-
-    try {
-      const result = await openRouter.chat.send({
-        model: "google/gemini-3-flash-preview",
-        messages: [
-          {
-            role: "user",
-            content: [
-              {
-                type: "text",
-                text: `Otrzymasz paragon zakupowy. Jeżeli nie widzisz paragonu na zdjęciu - napisz "Nie widzę paragonu". W przeciwnym razie Twoim zadaniem jest wypisanie wszystkich produktów i ich cen w formie listy punktowanej, a następnie podanie sumarycznej ceny za wszystkie produkty.
-    
-    Przeanalizuj paragon i wypisz:
-    1. Każdy produkt wraz z jego ceną w formie listy punktowanej (używając znaku "-")
-    2. Na końcu podaj sumę wszystkich cen (całkowitą kwotę do zapłaty)
-    
-    Jeśli na paragonie znajduje się już suma całkowita, użyj tej wartości. Jeśli nie, oblicz sumę wszystkich cen produktów.
-    
-    Format odpowiedzi:
-    - Użyj listy punktowanej dla każdego produktu
-    - Dla każdego produktu podaj nazwę i cenę
-    - Na końcu listy dodaj linię oddzielającą (np. "---")
-    - Następnie podaj "Suma całkowita:" z całkowitą kwotą
-    
-    Umieść swoją odpowiedź w tagach <answer>.`,
-              },
-              {
-                type: "image_url",
-                imageUrl: {
-                  url: imageUrl,
-                },
-              },
-            ],
-          },
-        ],
-        stream: false,
-      });
-
-      return new Response(JSON.stringify({ content: result.choices[0].message.content }), {
-        status: 200,
-        headers: { "Content-Type": "application/json" },
-      });
-    } catch (error) {
-      console.error("Failed to analyze receipt", error);
-      return new Response(JSON.stringify({ error: "Failed to analyze receipt" }), {
-        status: 500,
-        headers: { "Content-Type": "application/json" },
-      });
-    }
-  } else {
+  if (!imageUrl || !imageUrl.startsWith("data:image/")) {
     return new Response(JSON.stringify({ error: "Invalid image URL" }), {
       status: 400,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
+
+  const openRouter = new OpenRouter({
+    apiKey: import.meta.env.OPENROUTER_API_KEY,
+  });
+
+  try {
+    const result = await openRouter.chat.send({
+      model: "google/gemini-3-flash-preview",
+      messages: [
+        {
+          role: "system",
+          content: `You are a receipt scanning machine. Analyze receipt images and extract data.
+    
+Rules:
+- "price" is the unit price of a single item.
+- "quantity" is how many units were purchased (default 1 if not specified).
+- "total" is the final total from the receipt. If not visible, sum all (price * quantity).
+- "storeName" and "date" should be null if not visible on the receipt.
+- "date" must be in YYYY-MM-DD format.
+- Keep product names exactly as they appear on the receipt.`,
+        },
+        {
+          role: "user",
+          content: [
+            { type: "text", text: "Analyze this receipt." },
+            { type: "image_url", imageUrl: { url: imageUrl } },
+          ],
+        },
+      ],
+      responseFormat: {
+        type: "json_schema",
+        jsonSchema: {
+          name: "ReceiptAnalysis",
+          strict: true,
+          schema: zodToJsonSchema(ReceiptAnalysisSchema),
+        },
+      },
+      stream: false,
+    });
+
+    const raw = result.choices[0].message.content ?? "";
+    const parsed = ReceiptAnalysisSchema.parse(JSON.parse(raw as string));
+
+    return new Response(JSON.stringify(parsed), {
+      status: 200,
+      headers: { "Content-Type": "application/json" },
+    });
+  } catch (error) {
+    console.error("Failed to analyze receipt", error);
+
+    const message = error instanceof SyntaxError ? "Invalid JSON response from the model" : "Failed to analyze receipt";
+
+    return new Response(JSON.stringify({ error: message }), {
+      status: 500,
       headers: { "Content-Type": "application/json" },
     });
   }

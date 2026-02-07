@@ -1,4 +1,6 @@
-export async function getOpenRouterResult(imageUrl: string): Promise<string> {
+import type { ReceiptAnalysis } from "./schemas";
+
+export async function getOpenRouterResult(imageUrl: string): Promise<ReceiptAnalysis> {
   const response = await fetch("/api/analyze-receipt", {
     method: "POST",
     body: JSON.stringify({ imageUrl }),
@@ -11,5 +13,5 @@ export async function getOpenRouterResult(imageUrl: string): Promise<string> {
 
   const data = await response.json();
 
-  return data.content as string;
+  return data;
 }
