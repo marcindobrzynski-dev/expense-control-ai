@@ -15,6 +15,7 @@ function convertToBase64(file: File): Promise<string> {
 export function useUploadForm() {
   const [file, setFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [summary, setSummary] = useState<string | null>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -34,12 +35,13 @@ export function useUploadForm() {
     const base64File = await convertToBase64(file);
     const result = await getOpenRouterResult(base64File);
 
-    console.log(`Result: ${result}`);
+    setSummary(result);
   };
 
   return {
     file,
     previewUrl,
+    summary,
     handleFileChange,
     handleUpload,
   };
