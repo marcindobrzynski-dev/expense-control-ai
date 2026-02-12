@@ -140,21 +140,27 @@ Split `UploadForm.tsx` into:
   - [x] Improved error handling (`SyntaxError` distinction)
   - [x] Response returns validated `ReceiptAnalysis` object directly (no `{ content }` wrapper)
 
-### Phase 3: Component Development (The Frontend) - TODO
+### Phase 3: Component Development (The Frontend) - DONE
 
-- [ ] Create `FileUploader.tsx` (Dropzone + Camera)
-- [ ] Create `ReceiptPreview.tsx` (Image + Modal)
-- [ ] Create `AnalysisResult.tsx` (Table + Skeleton)
-- [ ] Refactor `useUploadForm` hook:
-  - [ ] Update to handle `ReceiptAnalysis` type (replace `string` state)
-  - [ ] Add state machine states (`IDLE`, `SELECTED`, `ANALYZING`, `SUCCESS`, `ERROR`)
-  - [ ] Add Toast triggers
-- [ ] Update `openRouter.ts` to return `ReceiptAnalysis` instead of `string`
+- [x] Create `FileUploader.tsx` (Dropzone + Camera)
+- [x] Create `ReceiptPreview.tsx` (Image + Modal)
+- [x] Create `AnalysisResult.tsx` (Table + Mismatch warning)
+- [x] Refactor `useUploadForm` hook:
+  - [x] Update to handle `ReceiptAnalysis` type (replace `string` state)
+  - [x] Add state machine states (`IDLE`, `SELECTED`, `ANALYZING`, `SUCCESS`, `ERROR`)
+  - [x] Add Toast triggers
+  - [x] Extract reducer to `src/lib/uploadReducer.ts` (pure, no side effects)
+  - [x] Extract types to `src/lib/types.ts` (`UploadState`, `UploadAction`)
+  - [x] Move `convertToBase64` to `src/lib/utils.ts`
+- [x] Update `openRouter.ts` to return `ReceiptAnalysis` instead of `string`
 
-### Phase 4: Integration & Layout - TODO
+### Phase 4: Integration & Layout - IN PROGRESS
 
-- [ ] Assemble `UploadForm` as smart container with sub-components
-- [ ] Implement 2-column layout (desktop) / vertical stack (mobile)
+- [x] Assemble `UploadForm` as smart container with sub-components
+- [x] Implement 2-column layout (desktop) / vertical stack (mobile)
+- [x] Dynamic layout: single column for IDLE/SELECTED, 2-column for ANALYZING/SUCCESS/ERROR
+- [x] Skeleton loading UI for ANALYZING state
+- [x] State-driven action buttons (Analyze, Retry, New Receipt)
 - [ ] Implement Mobile Sticky Footer
 - [ ] Add Tailwind animations (`animate-in`, `fade-in`)
 - [ ] Ensure strict responsiveness

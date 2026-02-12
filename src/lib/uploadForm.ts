@@ -1,49 +1,52 @@
-import { useState } from "react";
+import { useReducer } from "react";
 import { getOpenRouterResult } from "./openRouter";
-import type { ReceiptAnalysis } from "./schemas";
-
-function convertToBase64(file: File): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-
-    reader.onload = () => resolve(reader.result as string);
-    reader.onerror = reject;
-
-    reader.readAsDataURL(file);
-  });
-}
+import { toast } from "sonner";
+import uploadReducer from "./uploadReducer";
+import { convertToBase64 } from "./utils";
 
 export function useUploadForm() {
-  const [file, setFile] = useState<File | null>(null);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const [summary, setSummary] = useState<ReceiptAnalysis | null>(null);
+  const [state, dispatch] = useReducer(uploadReducer, { status: "IDLE" });
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setFile(e.target.files[0]);
-      setPreviewUrl(URL.createObjectURL(e.target.files[0]));
-    } else {
-      setFile(null);
-      setPreviewUrl(null);
-    }
-  };
-
-  const handleUpload = async () => {
-    if (!file || !previewUrl) {
-      return;
+  const handleFileSelect = (file: File) => {
+    if ("previewUrl" in state) {
+      URL.revokeObjectURL(state.previewUrl);
     }
 
-    const base64File = await convertToBase64(file);
-    const result = await getOpenRouterResult(base64File);
+    const previewUrl = URL.createObjectURL(file);
+    dispatch({ type: "SELECT_FILE", file, previewUrl });
+  }
 
-    setSummary(result);
-  };
+  const handleAnalyze = async () => {
+    if (state.status !== "SELECTED" && state.status !== "ERROR") return;
+ 
+    dispatch({ type: "ANALYZE" });
 
-  return {
-    file,
-    previewUrl,
-    summary,
-    handleFileChange,
-    handleUpload,
+    try {
+      const base64File = await convertToBase64(state.file);
+      const data = await getOpenRouterResult(base64File);
+      
+      dispatch({ type: "ANALYZE_SUCCESS", data });
+      toast.success("Receipt analyzed successfully");
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Unknown error";
+      
+      dispatch({ type: "ANALYZE_ERROR", error: message });
+      toast.error("Failed to analyze receipt");
+    }
+  }
+
+  const handleReset = () => {
+    if ("previewUrl" in state) {
+      URL.revokeObjectURL(state.previewUrl);
+    }
+
+    dispatch({ type: "RESET" });
+  }
+
+  return { 
+    state, 
+    handleFileSelect, 
+    handleAnalyze, 
+    handleReset 
   };
 }
