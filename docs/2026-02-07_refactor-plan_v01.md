@@ -161,10 +161,6 @@ Split `UploadForm.tsx` into:
 - [x] Dynamic layout: single column for IDLE/SELECTED, 2-column for ANALYZING/SUCCESS/ERROR
 - [x] Skeleton loading UI for ANALYZING state
 - [x] State-driven action buttons (Analyze, Retry, New Receipt)
-- [ ] Implement Mobile Sticky Footer
-- [ ] Add Tailwind animations (`animate-in`, `fade-in`)
-- [ ] Ensure strict responsiveness
-- [ ] Clean up unused components (`InputFile.tsx`, `UploadButton.tsx`, `ExpanseSummary.tsx`)
 
 ---
 
@@ -175,11 +171,3 @@ Split `UploadForm.tsx` into:
 **System prompt** provides rules for interpreting receipt data (unit price, quantity defaults, date format, null handling).
 
 **Schema enforcement** via OpenRouter `responseFormat` using `zodToJsonSchema()` - Zod schema is the single source of truth for both LLM output constraint and server-side validation.
-
----
-
-## 7. Future Considerations (Not included in this sprint)
-
-- Manual editing of scanned items.
-- User authentication / History saving.
-- Currency conversion.
