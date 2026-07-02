@@ -2,11 +2,13 @@
 import Header from "@/components/Header.astro";
 import Footer from "@/components/Footer.astro";
 import UploadForm from "@/components/UploadForm";
+import ReceiptsActions from "@/components/ReceiptsActions/ReceiptsActions";
 ---
 
 <div class="container flex flex-col items-center justify-center mx-auto text-center py-5 min-h-screen">
   <div class="w-full p-4 md:w-3/4 lg:w-2/3 lg:p-0">
     <Header />
+    <ReceiptsActions client:load />
     <UploadForm client:load />
     <Footer />
   </div>

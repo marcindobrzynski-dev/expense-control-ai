@@ -17,8 +17,8 @@ function AnalysisResult({ data }: AnalysisResultProps) {
         <p className="text-sm text-muted-foreground mb-3">Date purchased: {data.date ?? "Unknown date"}</p>
         {hasMismatch && (
           <p className="flex items-center gap-2 text-sm text-yellow-600">
-             <TriangleAlertIcon className="w-4 h-4" />
-             Items sum ({itemsSum.toFixed(2)}) doesn't match receipt total ({data.total.toFixed(2)})
+            <TriangleAlertIcon className="w-4 h-4" />
+            Items sum ({itemsSum.toFixed(2)}) doesn't match receipt total ({data.total.toFixed(2)})
           </p>
         )}
       </div>
@@ -26,10 +26,10 @@ function AnalysisResult({ data }: AnalysisResultProps) {
       <Table>
         <TableHeader>
           <TableRow>
-          <TableHead>Item</TableHead>
-          <TableHead>Price</TableHead>
-          <TableHead>Quantity</TableHead>
-          <TableHead>Subtotal</TableHead>
+            <TableHead>Item</TableHead>
+            <TableHead>Price</TableHead>
+            <TableHead>Quantity</TableHead>
+            <TableHead>Subtotal</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>

@@ -2,7 +2,7 @@ import type { APIRoute } from "astro";
 import { OpenRouter } from "@openrouter/sdk";
 import { zodToJsonSchema } from "zod-to-json-schema";
 import { ReceiptAnalysisSchema } from "@/lib/schemas";
-import { supabase } from '@/lib/supabase';
+import { supabase } from "@/lib/supabase";
 
 export const POST: APIRoute = async ({ request }) => {
   const { imageUrl } = await request.json();
@@ -63,7 +63,7 @@ Rules:
           store_name: parsed.storeName,
           purchase_date: parsed.date ? parsed.date : null,
           total_amount: parsed.total,
-          raw_ai_response: parsed
+          raw_ai_response: parsed,
         })
         .select()
         .single();
@@ -72,19 +72,17 @@ Rules:
         console.error("Error adding receipt: ", receiptError.message);
       } else if (receipt) {
         if (parsed.items && parsed.items.length > 0) {
-          const listOfReceiptItems = parsed.items.map(receiptItem => {
+          const listOfReceiptItems = parsed.items.map((receiptItem) => {
             return {
               receipt_id: receipt.id,
               product_name: receiptItem.name,
               unit_price: receiptItem.price,
               quantity: receiptItem.quantity,
-              total_price: receiptItem.price * receiptItem.quantity
+              total_price: receiptItem.price * receiptItem.quantity,
             };
-          })
+          });
 
-          const { error: receiptItemsError } = await supabase
-            .from("receipt_items")
-            .insert(listOfReceiptItems);
+          const { error: receiptItemsError } = await supabase.from("receipt_items").insert(listOfReceiptItems);
 
           if (receiptItemsError) {
             console.error("Error adding receipt items: ", receiptItemsError.message);

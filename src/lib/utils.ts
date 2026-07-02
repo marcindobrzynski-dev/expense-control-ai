@@ -1,7 +1,7 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 
-export function cn(...inputs: ClassValue[]) {
+function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
@@ -16,4 +16,4 @@ function convertToBase64(file: File): Promise<string> {
   });
 }
 
-export { convertToBase64 };
+export { cn, convertToBase64 };

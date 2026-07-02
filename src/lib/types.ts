@@ -8,7 +8,7 @@ type UploadState =
   | { status: "ERROR"; file: File; previewUrl: string; error: string };
 
 type UploadAction =
-  | { type: "SELECT_FILE"; file: File, previewUrl: string }
+  | { type: "SELECT_FILE"; file: File; previewUrl: string }
   | { type: "ANALYZE" }
   | { type: "ANALYZE_SUCCESS"; data: ReceiptAnalysis }
   | { type: "ANALYZE_ERROR"; error: string }

@@ -4,9 +4,11 @@ import { Toaster } from "@/components/ui/sonner";
 
 interface Props {
   title?: string;
+  description?: string;
 }
 
-const { title = "Expanse Control AI" } = Astro.props;
+const { title = "Expense Control AI", description = "Your personal, private and local financial management system." } =
+  Astro.props;
 ---
 
 <!doctype html>
@@ -16,6 +18,7 @@ const { title = "Expanse Control AI" } = Astro.props;
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
     <meta name="generator" content={Astro.generator} />
+    <meta name="description" content={description} />
   </head>
   <body>
     <slot />

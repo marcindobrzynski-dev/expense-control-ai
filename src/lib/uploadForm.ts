@@ -1,6 +1,6 @@
 import { useReducer } from "react";
-import { getOpenRouterResult } from "./openRouter";
 import { toast } from "sonner";
+import { getOpenRouterResult } from "./services/openrouter.service";
 import uploadReducer from "./uploadReducer";
 import { convertToBase64 } from "./utils";
 
@@ -14,26 +14,26 @@ export function useUploadForm() {
 
     const previewUrl = URL.createObjectURL(file);
     dispatch({ type: "SELECT_FILE", file, previewUrl });
-  }
+  };
 
   const handleAnalyze = async () => {
     if (state.status !== "SELECTED" && state.status !== "ERROR") return;
- 
+
     dispatch({ type: "ANALYZE" });
 
     try {
       const base64File = await convertToBase64(state.file);
       const data = await getOpenRouterResult(base64File);
-      
+
       dispatch({ type: "ANALYZE_SUCCESS", data });
       toast.success("Receipt analyzed successfully");
     } catch (error) {
       const message = error instanceof Error ? error.message : "Unknown error";
-      
+
       dispatch({ type: "ANALYZE_ERROR", error: message });
       toast.error("Failed to analyze receipt");
     }
-  }
+  };
 
   const handleReset = () => {
     if ("previewUrl" in state) {
@@ -41,12 +41,12 @@ export function useUploadForm() {
     }
 
     dispatch({ type: "RESET" });
-  }
+  };
 
-  return { 
-    state, 
-    handleFileSelect, 
-    handleAnalyze, 
-    handleReset 
+  return {
+    state,
+    handleFileSelect,
+    handleAnalyze,
+    handleReset,
   };
 }

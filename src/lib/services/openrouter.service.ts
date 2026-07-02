@@ -1,6 +1,6 @@
-import type { ReceiptAnalysis } from "./schemas";
+import type { ReceiptAnalysis } from "../schemas";
 
-export async function getOpenRouterResult(imageUrl: string): Promise<ReceiptAnalysis> {
+async function getOpenRouterResult(imageUrl: string): Promise<ReceiptAnalysis> {
   const response = await fetch("/api/analyze-receipt", {
     method: "POST",
     body: JSON.stringify({ imageUrl }),
@@ -15,3 +15,5 @@ export async function getOpenRouterResult(imageUrl: string): Promise<ReceiptAnal
 
   return data;
 }
+
+export { getOpenRouterResult };

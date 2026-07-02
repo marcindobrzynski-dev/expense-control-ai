@@ -18,7 +18,7 @@ function uploadReducer(state: UploadState, action: UploadAction): UploadState {
       return { ...state, status: "SUCCESS", data: action.data };
     case "ANALYZE_ERROR":
       if (state.status !== "ANALYZING") return state;
-      
+
       return { ...state, status: "ERROR", error: action.error };
     case "RESET":
       return { status: "IDLE" };

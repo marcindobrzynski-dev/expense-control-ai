@@ -10,7 +10,12 @@ function ReceiptPreview({ imageUrl }: ReceiptPreviewProps) {
 
   return (
     <>
-      <img src={imageUrl} alt="Receipt" className="max-h-[500px] w-full object-cover rounded-lg cursor-pointer" onClick={() => setOpen(true)} />
+      <img
+        src={imageUrl}
+        alt="Receipt"
+        className="max-h-[500px] w-full object-cover rounded-lg cursor-pointer"
+        onClick={() => setOpen(true)}
+      />
 
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="max-w-7xl p-0">
@@ -19,7 +24,7 @@ function ReceiptPreview({ imageUrl }: ReceiptPreviewProps) {
         </DialogContent>
       </Dialog>
     </>
-  )
+  );
 }
 
 export default ReceiptPreview;

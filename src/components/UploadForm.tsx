@@ -8,9 +8,7 @@ import { Button } from "./ui/button";
 export default function UploadForm() {
   const { state, handleFileSelect, handleAnalyze, handleReset } = useUploadForm();
 
-  const hasTwoColumns = state.status === "ANALYZING"
-    || state.status === "SUCCESS"
-    || state.status === "ERROR";
+  const hasTwoColumns = state.status === "ANALYZING" || state.status === "SUCCESS" || state.status === "ERROR";
 
   return (
     <div className={hasTwoColumns ? "w-full" : "max-w-md mx-auto"}>
@@ -22,7 +20,7 @@ export default function UploadForm() {
             <ReceiptPreview imageUrl={state.previewUrl} />
           )}
         </div>
-  
+
         {state.status !== "IDLE" && (
           <div>
             {state.status === "ANALYZING" && (
@@ -36,24 +34,28 @@ export default function UploadForm() {
             {state.status === "ERROR" && <p className="text-sm text-destructive">{state.error}</p>}
           </div>
         )}
-  
+
         <div className="flex justify-center gap-2 md:col-span-2 mt-5">
           {state.status === "SELECTED" && (
             <>
-              <Button className="cursor-pointer" onClick={handleAnalyze}>Analyze Receipt</Button>
-              <Button className="cursor-pointer" variant="outline" onClick={handleReset}>Other Receipt</Button>
+              <Button onClick={handleAnalyze}>Analyze Receipt</Button>
+              <Button variant="outline" onClick={handleReset}>
+                Other Receipt
+              </Button>
             </>
           )}
-          {state.status === "ANALYZING" && (
-            <Button className="cursor-pointer" disabled>Analyzing...</Button>
-          )}
+          {state.status === "ANALYZING" && <Button disabled>Analyzing...</Button>}
           {state.status === "SUCCESS" && (
-            <Button className="cursor-pointer" variant="outline" onClick={handleReset}>New Receipt</Button>
+            <Button variant="outline" onClick={handleReset}>
+              New Receipt
+            </Button>
           )}
           {state.status === "ERROR" && (
             <>
-              <Button className="cursor-pointer" onClick={handleAnalyze}>Try Again</Button>
-              <Button className="cursor-pointer" variant="outline" onClick={handleReset}>New Receipt</Button>
+              <Button onClick={handleAnalyze}>Try Again</Button>
+              <Button variant="outline" onClick={handleReset}>
+                New Receipt
+              </Button>
             </>
           )}
         </div>

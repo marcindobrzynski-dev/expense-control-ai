@@ -13,12 +13,12 @@ function FileUploader({ onFileSelect }: FileUploaderProps) {
   const onDragOver = (e: DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     setIsDragging(true);
-  }
+  };
 
   const onDragLeave = (e: DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     setIsDragging(false);
-  }
+  };
 
   const onDrop = (e: DragEvent<HTMLDivElement>) => {
     e.preventDefault();
@@ -29,7 +29,7 @@ function FileUploader({ onFileSelect }: FileUploaderProps) {
     if (file) {
       onFileSelect(file);
     }
-  }
+  };
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -37,7 +37,7 @@ function FileUploader({ onFileSelect }: FileUploaderProps) {
 
       onFileSelect(file);
     }
-  }
+  };
 
   return (
     <div
@@ -45,9 +45,8 @@ function FileUploader({ onFileSelect }: FileUploaderProps) {
       onDragLeave={onDragLeave}
       onDrop={onDrop}
       onClick={() => inputRef.current?.click()}
-      className={`flex flex-col items-center justify-center gap-2 p-10 rounded-lg border-2 border-dashed cursor-pointer transition-colors ${isDragging
-        ? "border-primary bg-primary/5"
-        : "border-muted-foreground/25 hover:border-muted-foreground/50"
+      className={`flex flex-col items-center justify-center gap-2 p-10 rounded-lg border-2 border-dashed cursor-pointer transition-colors ${
+        isDragging ? "border-primary bg-primary/5" : "border-muted-foreground/25 hover:border-muted-foreground/50"
       }`}
     >
       <CloudUploadIcon className="w-10 h-10" />
@@ -63,7 +62,7 @@ function FileUploader({ onFileSelect }: FileUploaderProps) {
         className="hidden"
       />
     </div>
-  )
+  );
 }
 
 export default FileUploader;
