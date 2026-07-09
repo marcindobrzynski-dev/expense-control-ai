@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { toast } from "sonner";
 import type { ReceiptsData, ReceiptsDataApi } from "./receipts-history.types";
 import { mapToReceiptsData } from "./receipts-history.utils";

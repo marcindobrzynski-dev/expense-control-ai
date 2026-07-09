@@ -16,7 +16,7 @@ function AnalysisResult({ data }: AnalysisResultProps) {
         <h2 className="text-2xl font-bold mb-1">{data.storeName ?? "Unknown store"}</h2>
         <p className="text-sm text-muted-foreground mb-3">Date purchased: {data.date ?? "Unknown date"}</p>
         {hasMismatch && (
-          <p className="flex items-center gap-2 text-sm text-yellow-600">
+          <p className="flex justify-center items-center gap-2 text-sm text-yellow-600 mb-3">
             <TriangleAlertIcon className="w-4 h-4" />
             Items sum ({itemsSum.toFixed(2)}) doesn't match receipt total ({data.total.toFixed(2)})
           </p>

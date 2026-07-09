@@ -1,4 +1,4 @@
-import { showLastReceipts } from "@/lib/services/receipts.service";
+import { showLastReceipts, deleteReceipt } from "@/lib/services/receipts.service";
 import type { APIRoute, APIContext } from "astro";
 import { supabaseClient } from "@/lib/supabase";
 
