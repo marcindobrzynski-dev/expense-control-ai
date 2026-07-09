@@ -1,8 +1,12 @@
 import type { APIRoute } from "astro";
+import { addNewReceipt, addNewReceiptItems } from "@/lib/services/receipts.service";
 import { OpenRouter } from "@openrouter/sdk";
+import { supabaseClient } from "@/lib/supabase";
+
 import { zodToJsonSchema } from "zod-to-json-schema";
 import { ReceiptAnalysisSchema } from "@/lib/schemas";
-import { supabase } from "@/lib/supabase";
+
+import type { ReceiptItem } from "@/types/receipts.types";
 
 export const POST: APIRoute = async ({ request }) => {
   const { imageUrl } = await request.json();
@@ -20,7 +24,7 @@ export const POST: APIRoute = async ({ request }) => {
 
   try {
     const result = await openRouter.chat.send({
-      model: "google/gemini-3-flash-preview",
+      model: "google/gemini-3.1-flash-lite",
       messages: [
         {
           role: "system",
@@ -57,24 +61,13 @@ Rules:
     const parsed = ReceiptAnalysisSchema.parse(JSON.parse(raw as string));
 
     if (parsed) {
-      const { data: receipt, error: receiptError } = await supabase
-        .from("receipts")
-        .insert({
-          store_name: parsed.storeName,
-          purchase_date: parsed.date ? parsed.date : null,
-          total_amount: parsed.total,
-          raw_ai_response: parsed,
-        })
-        .select()
-        .single();
+      const newReceiptData = await addNewReceipt(supabaseClient, parsed);
 
-      if (receiptError) {
-        console.error("Error adding receipt: ", receiptError.message);
-      } else if (receipt) {
+      if (newReceiptData) {
         if (parsed.items && parsed.items.length > 0) {
-          const listOfReceiptItems = parsed.items.map((receiptItem) => {
+          const listOfReceiptItems: ReceiptItem[] = parsed.items.map((receiptItem) => {
             return {
-              receipt_id: receipt.id,
+              receipt_id: newReceiptData.id as string,
               product_name: receiptItem.name,
               unit_price: receiptItem.price,
               quantity: receiptItem.quantity,
@@ -82,11 +75,7 @@ Rules:
             };
           });
 
-          const { error: receiptItemsError } = await supabase.from("receipt_items").insert(listOfReceiptItems);
-
-          if (receiptItemsError) {
-            console.error("Error adding receipt items: ", receiptItemsError.message);
-          }
+          await addNewReceiptItems(supabaseClient, listOfReceiptItems);
         }
       }
     }
