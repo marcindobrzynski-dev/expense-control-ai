@@ -1,22 +1,16 @@
-import { showLastReceipts, deleteReceipt } from "@/lib/services/receipts.service";
+import { showLastReceipts } from "@/lib/services/receipts.service";
 import type { APIRoute, APIContext } from "astro";
 import { supabaseClient } from "@/lib/supabase";
+
+import { createJsonResponse } from "@/lib/utils";
 
 async function handleGet(context: APIContext): Promise<Response> {
   try {
     const receiptsData = await showLastReceipts(supabaseClient, 10, 0);
 
-    return new Response(JSON.stringify(receiptsData), {
-      status: 200,
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    return createJsonResponse(receiptsData, 200);
   } catch {
-    return new Response(JSON.stringify({ error: "Failed to get receipts" }), {
-      status: 500,
-      headers: { "Content-Type": "application/json" },
-    });
+    return createJsonResponse({ error: "Failed to delete receipt" }, 500);
   }
 }
 

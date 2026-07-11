@@ -2,21 +2,18 @@ import type { APIRoute } from "astro";
 import { addNewReceipt, addNewReceiptItems } from "@/lib/services/receipts.service";
 import { OpenRouter } from "@openrouter/sdk";
 import { supabaseClient } from "@/lib/supabase";
+import { SCANNER_MACHINE_SYSTEM_PROMPT } from "@/lib/robots/robots.constants";
 
 import { zodToJsonSchema } from "zod-to-json-schema";
 import { ReceiptAnalysisSchema } from "@/lib/schemas";
+import { createJsonResponse } from "@/lib/utils";
 
 import type { ReceiptItem } from "@/types/receipts.types";
 
 export const POST: APIRoute = async ({ request }) => {
   const { imageUrl } = await request.json();
 
-  if (!imageUrl || !imageUrl.startsWith("data:image/")) {
-    return new Response(JSON.stringify({ error: "Invalid image URL" }), {
-      status: 400,
-      headers: { "Content-Type": "application/json" },
-    });
-  }
+  if (!imageUrl || !imageUrl.startsWith("data:image/")) return createJsonResponse({ error: "Invalid image URL" }, 400);
 
   const openRouter = new OpenRouter({
     apiKey: import.meta.env.OPENROUTER_API_KEY,
@@ -28,15 +25,7 @@ export const POST: APIRoute = async ({ request }) => {
       messages: [
         {
           role: "system",
-          content: `You are a receipt scanning machine. Analyze receipt images and extract data.
-    
-Rules:
-- "price" is the unit price of a single item.
-- "quantity" is how many units were purchased (default 1 if not specified).
-- "total" is the final total from the receipt. If not visible, sum all (price * quantity).
-- "storeName" and "date" should be null if not visible on the receipt.
-- "date" must be in YYYY-MM-DD format.
-- Keep product names exactly as they appear on the receipt.`,
+          content: SCANNER_MACHINE_SYSTEM_PROMPT,
         },
         {
           role: "user",
@@ -80,18 +69,10 @@ Rules:
       }
     }
 
-    return new Response(JSON.stringify(parsed), {
-      status: 200,
-      headers: { "Content-Type": "application/json" },
-    });
+    return createJsonResponse(parsed, 200)
   } catch (error) {
     console.error("Failed to analyze receipt", error);
-
     const message = error instanceof SyntaxError ? "Invalid JSON response from the model" : "Failed to analyze receipt";
-
-    return new Response(JSON.stringify({ error: message }), {
-      status: 500,
-      headers: { "Content-Type": "application/json" },
-    });
+    return createJsonResponse({ error: message }, 500, { "Content-Type": "application/json" });
   }
 };

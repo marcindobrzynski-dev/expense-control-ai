@@ -16,4 +16,11 @@ function convertToBase64(file: File): Promise<string> {
   });
 }
 
-export { cn, convertToBase64 };
+function createJsonResponse(message: unknown, code: number, headers?: Record<string, string>) {
+  return new Response(JSON.stringify(message), {
+    status: code,
+    headers: { "Content-Type": "application/json", ...headers },
+  });
+}
+
+export { cn, convertToBase64, createJsonResponse };
